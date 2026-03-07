@@ -265,6 +265,8 @@ export interface SpindleAPI {
     onCallback(handler: (params: Record<string, string>) => Promise<{ html?: string } | void>): () => void;
     /** Get the relative callback URL path for this extension */
     getCallbackUrl(): string;
+    /** Create a platform-managed OAuth state nonce for CSRF protection */
+    createState(): Promise<string>;
   };
 
   /** This extension's manifest */

@@ -245,6 +245,7 @@ export type WorkerToHost =
       error?: string;
     }
   | { type: "tool_invocation_result"; requestId: string; result?: string; error?: string }
+  | { type: "create_oauth_state"; requestId: string }
   | { type: "log"; level: "info" | "warn" | "error"; message: string };
 
 // ─── Host → Worker messages ──────────────────────────────────────────────
