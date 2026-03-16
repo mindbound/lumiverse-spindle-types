@@ -1,7 +1,7 @@
 /**
  * Gated permissions that extensions must declare in spindle.json.
  *
- * Free tier (no declaration needed): events, storage, macros, dom
+ * Free tier (no declaration needed): events, storage, macros, dom, variables
  *
  * Gated tier (must declare):
  * - "generation"       — fire generations on behalf of user
@@ -9,6 +9,8 @@
  * - "tools"            — register LLM tools
  * - "cors_proxy"       — use CORS proxy
  * - "context_handler"  — register global context middleware
+ * - "characters"       — CRUD on character cards
+ * - "chats"            — CRUD on chat sessions
  */
 export type SpindlePermission =
   | "generation"
@@ -21,7 +23,9 @@ export type SpindlePermission =
   | "event_tracking"
   | "ui_panels"
   | "app_manipulation"
-  | "oauth";
+  | "oauth"
+  | "characters"
+  | "chats";
 
 export const ALL_PERMISSIONS: readonly SpindlePermission[] = [
   "generation",
@@ -35,6 +39,8 @@ export const ALL_PERMISSIONS: readonly SpindlePermission[] = [
   "ui_panels",
   "app_manipulation",
   "oauth",
+  "characters",
+  "chats",
 ] as const;
 
 export function isValidPermission(p: string): p is SpindlePermission {

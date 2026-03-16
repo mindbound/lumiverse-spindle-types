@@ -62,6 +62,80 @@ export interface ConnectionProfileDTO {
   updated_at: number;
 }
 
+// ─── Character DTOs ─────────────────────────────────────────────────────
+
+/**
+ * Safe representation of a character exposed to extensions.
+ * Omits raw extensions blob — only exposes user-facing fields.
+ */
+export interface CharacterDTO {
+  id: string;
+  name: string;
+  description: string;
+  personality: string;
+  scenario: string;
+  first_mes: string;
+  mes_example: string;
+  creator_notes: string;
+  system_prompt: string;
+  post_history_instructions: string;
+  tags: string[];
+  alternate_greetings: string[];
+  creator: string;
+  image_id: string | null;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface CharacterCreateDTO {
+  name: string;
+  description?: string;
+  personality?: string;
+  scenario?: string;
+  first_mes?: string;
+  mes_example?: string;
+  creator_notes?: string;
+  system_prompt?: string;
+  post_history_instructions?: string;
+  tags?: string[];
+  alternate_greetings?: string[];
+  creator?: string;
+}
+
+export interface CharacterUpdateDTO {
+  name?: string;
+  description?: string;
+  personality?: string;
+  scenario?: string;
+  first_mes?: string;
+  mes_example?: string;
+  creator_notes?: string;
+  system_prompt?: string;
+  post_history_instructions?: string;
+  tags?: string[];
+  alternate_greetings?: string[];
+  creator?: string;
+}
+
+// ─── Chat DTOs ──────────────────────────────────────────────────────────
+
+/**
+ * Safe representation of a chat session exposed to extensions.
+ */
+export interface ChatDTO {
+  id: string;
+  character_id: string;
+  name: string;
+  metadata: Record<string, unknown>;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface ChatUpdateDTO {
+  name?: string;
+  metadata?: Record<string, unknown>;
+}
+
 /**
  * Structured error code included in permission-denied error messages.
  * Extensions can check `error.startsWith("PERMISSION_DENIED:")` to
@@ -246,7 +320,30 @@ export type WorkerToHost =
     }
   | { type: "tool_invocation_result"; requestId: string; result?: string; error?: string }
   | { type: "create_oauth_state"; requestId: string }
-  | { type: "log"; level: "info" | "warn" | "error"; message: string };
+  | { type: "log"; level: "info" | "warn" | "error"; message: string }
+  // ─── Variables (free tier) ──────────────────────────────────────────
+  | { type: "vars_get_local"; requestId: string; chatId: string; key: string }
+  | { type: "vars_set_local"; requestId: string; chatId: string; key: string; value: string }
+  | { type: "vars_delete_local"; requestId: string; chatId: string; key: string }
+  | { type: "vars_list_local"; requestId: string; chatId: string }
+  | { type: "vars_has_local"; requestId: string; chatId: string; key: string }
+  | { type: "vars_get_global"; requestId: string; key: string; userId?: string }
+  | { type: "vars_set_global"; requestId: string; key: string; value: string; userId?: string }
+  | { type: "vars_delete_global"; requestId: string; key: string; userId?: string }
+  | { type: "vars_list_global"; requestId: string; userId?: string }
+  | { type: "vars_has_global"; requestId: string; key: string; userId?: string }
+  // ─── Characters (gated: "characters") ──────────────────────────────
+  | { type: "characters_list"; requestId: string; limit?: number; offset?: number; userId?: string }
+  | { type: "characters_get"; requestId: string; characterId: string; userId?: string }
+  | { type: "characters_create"; requestId: string; input: CharacterCreateDTO; userId?: string }
+  | { type: "characters_update"; requestId: string; characterId: string; input: CharacterUpdateDTO; userId?: string }
+  | { type: "characters_delete"; requestId: string; characterId: string; userId?: string }
+  // ─── Chats (gated: "chats") ────────────────────────────────────────
+  | { type: "chats_list"; requestId: string; characterId?: string; limit?: number; offset?: number; userId?: string }
+  | { type: "chats_get"; requestId: string; chatId: string; userId?: string }
+  | { type: "chats_get_active"; requestId: string; userId?: string }
+  | { type: "chats_update"; requestId: string; chatId: string; input: ChatUpdateDTO; userId?: string }
+  | { type: "chats_delete"; requestId: string; chatId: string; userId?: string };
 
 // ─── Host → Worker messages ──────────────────────────────────────────────
 

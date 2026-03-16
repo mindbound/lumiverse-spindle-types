@@ -20,6 +20,11 @@ export type {
   RequestInitDTO,
   ConnectionProfileDTO,
   PermissionDeniedDetail,
+  CharacterDTO,
+  CharacterCreateDTO,
+  CharacterUpdateDTO,
+  ChatDTO,
+  ChatUpdateDTO,
   WorkerToHost,
   HostToWorker,
 } from "./api";

@@ -7,6 +7,11 @@ import type {
   RequestInitDTO,
   ConnectionProfileDTO,
   PermissionDeniedDetail,
+  CharacterDTO,
+  CharacterCreateDTO,
+  CharacterUpdateDTO,
+  ChatDTO,
+  ChatUpdateDTO,
 } from "./api";
 
 /** The global `spindle` object available in backend extension workers */
@@ -226,6 +231,52 @@ export interface SpindleAPI {
      * Returns null if the connection doesn't exist or isn't accessible.
      */
     get(connectionId: string, userId?: string): Promise<ConnectionProfileDTO | null>;
+  };
+
+  /**
+   * Local (chat-scoped) and global variable access (free tier — no permission needed).
+   * Uses the same storage as built-in {{getvar}}/{{setgvar}} macros.
+   */
+  variables: {
+    local: {
+      get(chatId: string, key: string): Promise<string>;
+      set(chatId: string, key: string, value: string): Promise<void>;
+      delete(chatId: string, key: string): Promise<void>;
+      list(chatId: string): Promise<Record<string, string>>;
+      has(chatId: string, key: string): Promise<boolean>;
+    };
+    global: {
+      get(key: string): Promise<string>;
+      set(key: string, value: string): Promise<void>;
+      delete(key: string): Promise<void>;
+      list(): Promise<Record<string, string>>;
+      has(key: string): Promise<boolean>;
+    };
+  };
+
+  /**
+   * Character CRUD (permission: "characters").
+   * Returns safe DTO representations — raw extensions blob is not exposed.
+   */
+  characters: {
+    list(options?: { limit?: number; offset?: number }): Promise<{ data: CharacterDTO[]; total: number }>;
+    get(characterId: string): Promise<CharacterDTO | null>;
+    create(input: CharacterCreateDTO): Promise<CharacterDTO>;
+    update(characterId: string, input: CharacterUpdateDTO): Promise<CharacterDTO>;
+    delete(characterId: string): Promise<boolean>;
+  };
+
+  /**
+   * Chat session CRUD (permission: "chats").
+   * Separate from `chat` (message-level mutation) — this operates on chat entities.
+   */
+  chats: {
+    list(options?: { characterId?: string; limit?: number; offset?: number }): Promise<{ data: ChatDTO[]; total: number }>;
+    get(chatId: string): Promise<ChatDTO | null>;
+    /** Get the user's currently active chat (as tracked by the frontend). Returns null if none. */
+    getActive(): Promise<ChatDTO | null>;
+    update(chatId: string, input: ChatUpdateDTO): Promise<ChatDTO>;
+    delete(chatId: string): Promise<boolean>;
   };
 
   permissions: {
