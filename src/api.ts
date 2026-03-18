@@ -240,6 +240,46 @@ export interface WorldBookEntryCreateDTO {
 
 export type WorldBookEntryUpdateDTO = WorldBookEntryCreateDTO;
 
+// ─── Persona DTOs ──────────────────────────────────────────────────────
+
+/**
+ * Safe representation of a persona exposed to extensions.
+ * Omits avatar_path (internal filesystem path) — use image_id for avatar access.
+ */
+export interface PersonaDTO {
+  id: string;
+  name: string;
+  title: string;
+  description: string;
+  image_id: string | null;
+  attached_world_book_id: string | null;
+  folder: string;
+  is_default: boolean;
+  metadata: Record<string, unknown>;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface PersonaCreateDTO {
+  name: string;
+  title?: string;
+  description?: string;
+  folder?: string;
+  is_default?: boolean;
+  attached_world_book_id?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface PersonaUpdateDTO {
+  name?: string;
+  title?: string;
+  description?: string;
+  folder?: string;
+  is_default?: boolean;
+  attached_world_book_id?: string;
+  metadata?: Record<string, unknown>;
+}
+
 /**
  * Structured error code included in permission-denied error messages.
  * Extensions can check `error.startsWith("PERMISSION_DENIED:")` to
@@ -459,7 +499,19 @@ export type WorkerToHost =
   | { type: "world_book_entries_get"; requestId: string; entryId: string; userId?: string }
   | { type: "world_book_entries_create"; requestId: string; worldBookId: string; input: WorldBookEntryCreateDTO; userId?: string }
   | { type: "world_book_entries_update"; requestId: string; entryId: string; input: WorldBookEntryUpdateDTO; userId?: string }
-  | { type: "world_book_entries_delete"; requestId: string; entryId: string; userId?: string };
+  | { type: "world_book_entries_delete"; requestId: string; entryId: string; userId?: string }
+  // ─── Personas (gated: "personas") ────────────────────────────────────
+  | { type: "personas_list"; requestId: string; limit?: number; offset?: number; userId?: string }
+  | { type: "personas_get"; requestId: string; personaId: string; userId?: string }
+  | { type: "personas_get_default"; requestId: string; userId?: string }
+  | { type: "personas_get_active"; requestId: string; userId?: string }
+  | { type: "personas_create"; requestId: string; input: PersonaCreateDTO; userId?: string }
+  | { type: "personas_update"; requestId: string; personaId: string; input: PersonaUpdateDTO; userId?: string }
+  | { type: "personas_delete"; requestId: string; personaId: string; userId?: string }
+  | { type: "personas_switch"; requestId: string; personaId: string | null; userId?: string }
+  | { type: "personas_get_world_book"; requestId: string; personaId: string; userId?: string }
+  // ─── Toast (free tier) ───────────────────────────────────────────────
+  | { type: "toast_show"; toastType: "success" | "warning" | "error" | "info"; message: string; title?: string; duration?: number };
 
 // ─── Host → Worker messages ──────────────────────────────────────────────
 

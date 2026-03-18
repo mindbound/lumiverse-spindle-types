@@ -18,6 +18,9 @@ import type {
   WorldBookEntryDTO,
   WorldBookEntryCreateDTO,
   WorldBookEntryUpdateDTO,
+  PersonaDTO,
+  PersonaCreateDTO,
+  PersonaUpdateDTO,
 } from "./api";
 
 /** The global `spindle` object available in backend extension workers */
@@ -310,6 +313,28 @@ export interface SpindleAPI {
     };
   };
 
+  /**
+   * Personas CRUD (permission: "personas").
+   * Manage user personas (identity profiles).
+   * For user-scoped extensions, userId is inferred from the extension owner.
+   * For operator-scoped extensions, pass userId to scope to a specific user.
+   */
+  personas: {
+    list(options?: { limit?: number; offset?: number; userId?: string }): Promise<{ data: PersonaDTO[]; total: number }>;
+    get(personaId: string, userId?: string): Promise<PersonaDTO | null>;
+    /** Get the user's default persona (is_default = true). Returns null if none set. */
+    getDefault(userId?: string): Promise<PersonaDTO | null>;
+    /** Get the user's currently active persona (as tracked by the frontend). Returns null if none. */
+    getActive(userId?: string): Promise<PersonaDTO | null>;
+    create(input: PersonaCreateDTO, userId?: string): Promise<PersonaDTO>;
+    update(personaId: string, input: PersonaUpdateDTO, userId?: string): Promise<PersonaDTO>;
+    delete(personaId: string, userId?: string): Promise<boolean>;
+    /** Switch the active persona by setting the `activePersonaId` setting. Pass null to deactivate. */
+    switchActive(personaId: string | null, userId?: string): Promise<void>;
+    /** Get the world book attached to a persona. Returns null if none attached. */
+    getWorldBook(personaId: string, userId?: string): Promise<WorldBookDTO | null>;
+  };
+
   permissions: {
     getGranted(): Promise<string[]>;
     /**
@@ -339,6 +364,14 @@ export interface SpindleAPI {
     info(msg: string): void;
     warn(msg: string): void;
     error(msg: string): void;
+  };
+
+  /** Show toast notifications in the frontend UI (free tier — no permission needed) */
+  toast: {
+    success(message: string, options?: { title?: string; duration?: number }): void;
+    warning(message: string, options?: { title?: string; duration?: number }): void;
+    error(message: string, options?: { title?: string; duration?: number }): void;
+    info(message: string, options?: { title?: string; duration?: number }): void;
   };
 
   /** OAuth callback handling (permission: "oauth") */

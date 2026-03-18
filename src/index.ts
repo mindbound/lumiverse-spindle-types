@@ -31,6 +31,9 @@ export type {
   WorldBookEntryDTO,
   WorldBookEntryCreateDTO,
   WorldBookEntryUpdateDTO,
+  PersonaDTO,
+  PersonaCreateDTO,
+  PersonaUpdateDTO,
   WorkerToHost,
   HostToWorker,
 } from "./api";

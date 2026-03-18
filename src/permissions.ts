@@ -11,6 +11,7 @@
  * - "context_handler"  — register global context middleware
  * - "characters"       — CRUD on character cards
  * - "chats"            — CRUD on chat sessions
+ * - "personas"         — CRUD on personas
  */
 export type SpindlePermission =
   | "generation"
@@ -26,7 +27,8 @@ export type SpindlePermission =
   | "oauth"
   | "characters"
   | "chats"
-  | "world_books";
+  | "world_books"
+  | "personas";
 
 export const ALL_PERMISSIONS: readonly SpindlePermission[] = [
   "generation",
@@ -43,6 +45,7 @@ export const ALL_PERMISSIONS: readonly SpindlePermission[] = [
   "characters",
   "chats",
   "world_books",
+  "personas",
 ] as const;
 
 export function isValidPermission(p: string): p is SpindlePermission {
