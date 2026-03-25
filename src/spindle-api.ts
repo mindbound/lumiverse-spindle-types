@@ -403,6 +403,40 @@ export interface SpindleAPI {
   };
 
   /**
+   * Macro resolution (free tier — no permission needed).
+   * Resolve `{{macro}}` placeholders in arbitrary text using
+   * the full Lumiverse macro engine (character fields, chat context,
+   * variables, time/date, random, etc.).
+   */
+  macros: {
+    /**
+     * Resolve all macros in the given template string.
+     * Provide `chatId` and/or `characterId` for full context resolution.
+     * Without them, only context-free macros (time, random, etc.) resolve.
+     *
+     * @example
+     * ```ts
+     * const { text } = await spindle.macros.resolve(
+     *   'Hello {{user}}, I am {{char}}!',
+     *   { chatId: 'abc', characterId: 'xyz' },
+     * )
+     * ```
+     */
+    resolve(
+      template: string,
+      options?: {
+        chatId?: string;
+        characterId?: string;
+        /** For operator-scoped extensions only. */
+        userId?: string;
+      },
+    ): Promise<{
+      text: string;
+      diagnostics: Array<{ message: string; offset: number; length: number }>;
+    }>;
+  };
+
+  /**
    * User presence queries (free tier — no permission needed).
    * Check whether a user currently has the Lumiverse app visible/focused
    * in at least one browser tab or PWA window.
