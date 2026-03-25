@@ -376,6 +376,32 @@ export interface SpindleAPI {
     error(msg: string): void;
   };
 
+  /**
+   * Push notifications (permission: "push_notification").
+   * Send OS-level push notifications to users and check push status.
+   * Notifications are attributed to your extension name.
+   */
+  push: {
+    /**
+     * Send a push notification to a user's registered devices.
+     * Only delivered when the app is not focused (avoids double-notification).
+     */
+    send(input: {
+      title: string;
+      body: string;
+      tag?: string;
+      url?: string;
+    }, userId?: string): Promise<{ sent: number }>;
+    /**
+     * Check if push notifications are available for a user.
+     * Returns subscription count and whether the push system is active.
+     */
+    getStatus(userId?: string): Promise<{
+      available: boolean;
+      subscriptionCount: number;
+    }>;
+  };
+
   /** Show toast notifications in the frontend UI (free tier — no permission needed) */
   toast: {
     success(message: string, options?: { title?: string; duration?: number }): void;
