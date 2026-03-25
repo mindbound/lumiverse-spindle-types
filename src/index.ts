@@ -72,6 +72,9 @@ export type {
   SpindleAppMountHandle,
   SpindleInputBarActionOptions,
   SpindleInputBarActionHandle,
+  SpindleContextMenuOptions,
+  SpindleContextMenuItemDef,
+  SpindleContextMenuResult,
 } from "./dom";
 
 export type { ExtensionInfo } from "./extension-info";

@@ -185,6 +185,35 @@ export interface SpindleTextEditorResult {
   cancelled: boolean;
 }
 
+// ── Context Menu ──
+
+export interface SpindleContextMenuOptions {
+  /** Screen position to render the menu at. */
+  position: { x: number; y: number };
+  /** Menu items. Items with `type: 'divider'` render as visual separators. */
+  items: SpindleContextMenuItemDef[];
+}
+
+export interface SpindleContextMenuItemDef {
+  /** Unique key returned when this item is selected. */
+  key: string;
+  /** Display label. Ignored for dividers. */
+  label: string;
+  /** Render as disabled (greyed out, not clickable). */
+  disabled?: boolean;
+  /** Render in danger/red style. */
+  danger?: boolean;
+  /** Render with active/highlighted style. */
+  active?: boolean;
+  /** Set to `'divider'` for a visual separator. Default: `'item'`. */
+  type?: "item" | "divider";
+}
+
+export interface SpindleContextMenuResult {
+  /** The `key` of the selected item, or `null` if the menu was dismissed without selection. */
+  selectedKey: string | null;
+}
+
 /** Context object provided to frontend extension modules */
 export interface SpindleFrontendContext {
   dom: SpindleDOMHelper;
@@ -199,6 +228,9 @@ export interface SpindleFrontendContext {
     requestDockPanel(options: SpindleDockPanelOptions): SpindleDockPanelHandle;
     mountApp(options?: SpindleAppMountOptions): SpindleAppMountHandle;
     registerInputBarAction(options: SpindleInputBarActionOptions): SpindleInputBarActionHandle;
+    /** Show a themed context menu at the given position and wait for the user's selection.
+     *  Returns the `key` of the selected item, or `null` if the menu was dismissed. */
+    showContextMenu(options: SpindleContextMenuOptions): Promise<SpindleContextMenuResult>;
   };
   uploads: {
     pickFile(options?: {
