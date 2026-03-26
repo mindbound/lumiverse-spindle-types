@@ -29,7 +29,8 @@ export type SpindlePermission =
   | "chats"
   | "world_books"
   | "personas"
-  | "push_notification";
+  | "push_notification"
+  | "image_gen";
 
 export const ALL_PERMISSIONS: readonly SpindlePermission[] = [
   "generation",
@@ -48,6 +49,7 @@ export const ALL_PERMISSIONS: readonly SpindlePermission[] = [
   "world_books",
   "personas",
   "push_notification",
+  "image_gen",
 ] as const;
 
 export function isValidPermission(p: string): p is SpindlePermission {

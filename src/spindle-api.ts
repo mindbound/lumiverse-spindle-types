@@ -25,6 +25,10 @@ import type {
   DryRunRequestDTO,
   DryRunResultDTO,
   ChatMemoryResultDTO,
+  ImageGenRequestDTO,
+  ImageGenResultDTO,
+  ImageGenConnectionDTO,
+  ImageGenProviderDTO,
 } from "./api";
 
 /** The global `spindle` object available in backend extension workers */
@@ -246,6 +250,40 @@ export interface SpindleAPI {
      * Returns null if the connection doesn't exist or isn't accessible.
      */
     get(connectionId: string, userId?: string): Promise<ConnectionProfileDTO | null>;
+  };
+
+  /**
+   * Image generation (permission: "image_gen").
+   * Generate images via the user's configured image gen connection profiles.
+   * Supports listing providers, connections, models, and firing generations.
+   */
+  imageGen: {
+    /**
+     * Generate an image using a connection profile.
+     * If `connection_id` is omitted, uses the user's default image gen connection.
+     * Returns the image as a base64 data URL.
+     */
+    generate(input: ImageGenRequestDTO): Promise<ImageGenResultDTO>;
+    /**
+     * List available image generation providers with their capability schemas.
+     * The schemas describe supported parameters, models, and features.
+     */
+    getProviders(userId?: string): Promise<ImageGenProviderDTO[]>;
+    /**
+     * List the user's image gen connection profiles.
+     * API keys are never exposed — only `has_api_key` boolean.
+     */
+    listConnections(userId?: string): Promise<ImageGenConnectionDTO[]>;
+    /**
+     * Get a single image gen connection profile by ID.
+     * Returns null if not found or not accessible.
+     */
+    getConnection(connectionId: string, userId?: string): Promise<ImageGenConnectionDTO | null>;
+    /**
+     * List available models for a connection profile.
+     * For providers with dynamic model lists, this fetches live from the upstream API.
+     */
+    getModels(connectionId: string, userId?: string): Promise<Array<{ id: string; label: string }>>;
   };
 
   /**

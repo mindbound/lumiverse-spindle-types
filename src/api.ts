@@ -81,6 +81,75 @@ export interface ConnectionProfileDTO {
   updated_at: number;
 }
 
+// ─── Image Generation DTOs ──────────────────────────────────────────────
+
+/**
+ * Safe representation of an image generation connection profile.
+ * Never contains the actual API key — only `has_api_key` boolean.
+ */
+export interface ImageGenConnectionDTO {
+  id: string;
+  name: string;
+  provider: string;
+  api_url: string;
+  model: string;
+  is_default: boolean;
+  has_api_key: boolean;
+  default_parameters: Record<string, unknown>;
+  metadata: Record<string, unknown>;
+  created_at: number;
+  updated_at: number;
+}
+
+/** Parameter schema for a single image gen provider parameter. */
+export interface ImageGenParameterSchemaDTO {
+  type: "number" | "integer" | "boolean" | "string" | "select" | "image_array";
+  default?: unknown;
+  min?: number;
+  max?: number;
+  step?: number;
+  description: string;
+  required?: boolean;
+  options?: Array<{ id: string; label: string }>;
+  group?: string;
+}
+
+/** Capabilities exposed by an image generation provider. */
+export interface ImageGenProviderDTO {
+  id: string;
+  name: string;
+  capabilities: {
+    parameters: Record<string, ImageGenParameterSchemaDTO>;
+    apiKeyRequired: boolean;
+    modelListStyle: "static" | "dynamic" | "google";
+    staticModels?: Array<{ id: string; label: string }>;
+    defaultUrl: string;
+  };
+}
+
+/** Input for `spindle.imageGen.generate()` */
+export interface ImageGenRequestDTO {
+  /** Connection profile ID to use. If omitted, uses the user's default image gen connection. */
+  connection_id?: string;
+  /** Text prompt for image generation. */
+  prompt: string;
+  /** Negative prompt (provider-dependent). */
+  negativePrompt?: string;
+  /** Model override. If omitted, uses the connection profile's model. */
+  model?: string;
+  /** Provider-specific parameters. Merged with the connection's default_parameters. */
+  parameters?: Record<string, unknown>;
+  /** For operator-scoped extensions. */
+  userId?: string;
+}
+
+/** Result from `spindle.imageGen.generate()` */
+export interface ImageGenResultDTO {
+  imageDataUrl: string;
+  model: string;
+  provider: string;
+}
+
 // ─── Character DTOs ─────────────────────────────────────────────────────
 
 /**
@@ -639,8 +708,20 @@ export type WorkerToHost =
   // ─── Toast (free tier) ───────────────────────────────────────────────
   | { type: "toast_show"; toastType: "success" | "warning" | "error" | "info"; message: string; title?: string; duration?: number }
   // ─── Push Notifications (gated: "push_notification") ────────────────
-  | { type: "push_send"; requestId: string; title: string; body: string; tag?: string; url?: string; userId?: string }
-  | { type: "push_get_status"; requestId: string; userId?: string };
+  | { type: "push_send"; requestId: string; title: string; body: string; tag?: string; url?: string; userId?: string; icon?: string; rawTitle?: boolean }
+  | { type: "push_get_status"; requestId: string; userId?: string }
+  // ─── User Visibility (free tier) ───────────────────────────────────
+  | { type: "user_is_visible"; requestId: string; userId?: string }
+  // ─── Text Editor (free tier) ───────────────────────────────────────
+  | { type: "text_editor_open"; requestId: string; title?: string; value?: string; placeholder?: string; userId?: string }
+  // ─── Macro Resolution (free tier) ──────────────────────────────────
+  | { type: "macros_resolve"; requestId: string; template: string; chatId?: string; characterId?: string; userId?: string }
+  // ─── Image Generation (gated: "image_gen") ──────────────────────────
+  | { type: "image_gen_generate"; requestId: string; input: ImageGenRequestDTO }
+  | { type: "image_gen_providers"; requestId: string; userId?: string }
+  | { type: "image_gen_connections_list"; requestId: string; userId?: string }
+  | { type: "image_gen_connections_get"; requestId: string; connectionId: string; userId?: string }
+  | { type: "image_gen_models"; requestId: string; connectionId: string; userId?: string };
 
 // ─── Host → Worker messages ──────────────────────────────────────────────
 

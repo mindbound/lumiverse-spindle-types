@@ -45,6 +45,11 @@ export type {
   DryRunTokenCountDTO,
   ChatMemoryChunkDTO,
   ChatMemoryResultDTO,
+  ImageGenConnectionDTO,
+  ImageGenParameterSchemaDTO,
+  ImageGenProviderDTO,
+  ImageGenRequestDTO,
+  ImageGenResultDTO,
   WorkerToHost,
   HostToWorker,
 } from "./api";
