@@ -33,6 +33,7 @@ import type {
   ThemeOverrideDTO,
   ThemeInfoDTO,
   ColorExtractionResult,
+  SpindleModalItemDTO,
 } from "./api";
 
 /** The global `spindle` object available in backend extension workers */
@@ -632,6 +633,58 @@ export interface SpindleAPI {
      * @param imageId - ID of an image in the images table
      */
     extractColors(imageId: string, userId?: string): Promise<ColorExtractionResult>;
+  };
+
+  /**
+   * Modal presentation (free tier — no permission needed).
+   * Opens a system-themed modal overlay on the user's frontend.
+   * The host renders the chrome (backdrop, header, close button);
+   * the extension provides structured content items for the body.
+   *
+   * **Stack limit:** A maximum of 2 modals may be open per extension at any
+   * time. Attempting to open a third rejects with an error. This prevents
+   * extensions from layering unbounded UI. Typical usage: one primary modal
+   * plus one nested text editor or confirmation prompt.
+   *
+   * @example
+   * ```ts
+   * const result = await spindle.modal.open({
+   *   title: 'Recent Nudges',
+   *   items: [
+   *     { type: 'text', content: 'Hello from the character!' },
+   *     { type: 'divider' },
+   *     { type: 'key_value', label: 'Sent', value: '2 hours ago' },
+   *   ],
+   * })
+   * // result.dismissedBy === 'user' | 'extension' | 'cleanup'
+   * ```
+   */
+  modal: {
+    /**
+     * Open a modal and wait for it to be dismissed.
+     * The host serializes the provided `items` into a themed body layout.
+     * The call blocks until the modal is closed.
+     */
+    open(options: {
+      /** Header title. */
+      title: string;
+      /** Structured body content items rendered by the host. */
+      items: SpindleModalItemDTO[];
+      /** Optional width override. Default: `420`. Clamped to viewport. */
+      width?: number;
+      /** Optional max-height override. Default: `520`. Clamped to viewport. */
+      maxHeight?: number;
+      /**
+       * If true, clicking the backdrop does NOT dismiss the modal.
+       * Default: `false`.
+       */
+      persistent?: boolean;
+      /** For operator-scoped extensions only. */
+      userId?: string;
+    }): Promise<{
+      /** How the modal was dismissed. */
+      dismissedBy: "user" | "extension" | "cleanup";
+    }>;
   };
 
   /** This extension's manifest */

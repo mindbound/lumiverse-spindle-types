@@ -619,6 +619,25 @@ export interface ThemeInfoDTO {
   characterAware: boolean;
 }
 
+// ─── Modal content items (used by backend-initiated modals) ─────────────
+
+/**
+ * Structured content items for backend-initiated modals (`spindle.modal.open`).
+ * The host renders these into the modal body using system theming.
+ * For full DOM control, use the frontend `ctx.ui.showModal()` API instead.
+ */
+export type SpindleModalItemDTO =
+  /** A block of text content. Supports multiline via newlines. */
+  | { type: "text"; content: string; muted?: boolean }
+  /** A horizontal divider line. */
+  | { type: "divider" }
+  /** A label–value pair displayed in a horizontal row. */
+  | { type: "key_value"; label: string; value: string }
+  /** A section heading within the modal body. */
+  | { type: "heading"; content: string }
+  /** A themed card/container that groups child items. */
+  | { type: "card"; items: SpindleModalItemDTO[] };
+
 // ─── Worker → Host messages ──────────────────────────────────────────────
 
 export type WorkerToHost =
@@ -846,6 +865,8 @@ export type WorkerToHost =
   | { type: "user_is_visible"; requestId: string; userId?: string }
   // ─── Text Editor (free tier) ───────────────────────────────────────
   | { type: "text_editor_open"; requestId: string; title?: string; value?: string; placeholder?: string; userId?: string }
+  // ─── Modal (free tier) ────────────────────────────────────────────
+  | { type: "modal_open"; requestId: string; title: string; items: SpindleModalItemDTO[]; width?: number; maxHeight?: number; persistent?: boolean; userId?: string }
   // ─── Macro Resolution (free tier) ──────────────────────────────────
   | { type: "macros_resolve"; requestId: string; template: string; chatId?: string; characterId?: string; userId?: string }
   // ─── Image Generation (gated: "image_gen") ──────────────────────────

@@ -56,6 +56,7 @@ export type {
   ColorExtractionResult,
   ColorRGB,
   ColorHSL,
+  SpindleModalItemDTO,
   WorkerToHost,
   HostToWorker,
 } from "./api";
@@ -86,6 +87,8 @@ export type {
   SpindleContextMenuOptions,
   SpindleContextMenuItemDef,
   SpindleContextMenuResult,
+  SpindleModalOptions,
+  SpindleModalHandle,
 } from "./dom";
 
 export type { ExtensionInfo } from "./extension-info";

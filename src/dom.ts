@@ -214,6 +214,53 @@ export interface SpindleContextMenuResult {
   selectedKey: string | null;
 }
 
+// ── Modal ──
+
+/**
+ * Options for `ctx.ui.showModal()`.
+ * The host renders a system-themed modal overlay with a header (title + close button).
+ * The extension receives an HTMLElement (`root` on the handle) and fully owns the body content.
+ */
+export interface SpindleModalOptions {
+  /** Modal title displayed in the header. */
+  title: string;
+  /** Optional width override. Default: `420`. Clamped to viewport. */
+  width?: number;
+  /** Optional max-height override. Default: `520`. Clamped to viewport. */
+  maxHeight?: number;
+  /**
+   * If true, clicking the backdrop does NOT dismiss the modal.
+   * The user must use the close button or the extension must call `dismiss()`.
+   * Default: `false` (backdrop click dismisses).
+   */
+  persistent?: boolean;
+}
+
+/**
+ * Handle returned by `ctx.ui.showModal()`.
+ * Provides direct DOM access to the modal body and lifecycle controls.
+ *
+ * Extensions may have at most **2 stacked modals** open simultaneously
+ * (e.g. one primary modal and one nested text editor). Attempting to open
+ * a third modal will throw an error.
+ */
+export interface SpindleModalHandle {
+  /** The body container element. The extension fully owns this element's contents. */
+  root: HTMLElement;
+  /** Unique modal ID assigned by the host. */
+  modalId: string;
+  /** Programmatically close the modal. */
+  dismiss(): void;
+  /** Update the header title. */
+  setTitle(title: string): void;
+  /**
+   * Register a callback invoked when the modal is dismissed
+   * (by the user, by `dismiss()`, or by extension cleanup).
+   * Returns an unsubscribe function.
+   */
+  onDismiss(handler: () => void): () => void;
+}
+
 /** Context object provided to frontend extension modules */
 export interface SpindleFrontendContext {
   dom: SpindleDOMHelper;
@@ -231,6 +278,23 @@ export interface SpindleFrontendContext {
     /** Show a themed context menu at the given position and wait for the user's selection.
      *  Returns the `key` of the selected item, or `null` if the menu was dismissed. */
     showContextMenu(options: SpindleContextMenuOptions): Promise<SpindleContextMenuResult>;
+    /**
+     * Open a system-themed modal overlay.
+     * The host renders the chrome (backdrop, header with title & close button);
+     * the extension owns the body via the returned handle's `root` element.
+     *
+     * **Stack limit:** A maximum of 2 modals may be open per extension at any
+     * time (e.g. one primary modal and one nested text editor or confirmation).
+     * Exceeding this limit throws an error.
+     *
+     * @example
+     * ```ts
+     * const modal = ctx.ui.showModal({ title: 'Nudge History' })
+     * modal.root.innerHTML = '<ul><li>Item 1</li></ul>'
+     * modal.onDismiss(() => console.log('closed'))
+     * ```
+     */
+    showModal(options: SpindleModalOptions): SpindleModalHandle;
   };
   uploads: {
     pickFile(options?: {
