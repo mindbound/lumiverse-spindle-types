@@ -89,6 +89,9 @@ export type {
   SpindleContextMenuResult,
   SpindleModalOptions,
   SpindleModalHandle,
+  SpindleConfirmVariant,
+  SpindleConfirmOptions,
+  SpindleConfirmResult,
 } from "./dom";
 
 export type { ExtensionInfo } from "./extension-info";

@@ -685,6 +685,47 @@ export interface SpindleAPI {
       /** How the modal was dismissed. */
       dismissedBy: "user" | "extension" | "cleanup";
     }>;
+    /**
+     * Show a confirmation modal and wait for the user's response.
+     * The host renders a themed dialog with a message, variant-colored
+     * confirm button, and a cancel button. The call blocks until the
+     * user responds.
+     *
+     * Counts toward the 2 stacked modals limit per extension.
+     *
+     * @example
+     * ```ts
+     * const { confirmed } = await spindle.modal.confirm({
+     *   title: 'Clear History',
+     *   message: 'This will delete all nudge history. This action cannot be undone.',
+     *   variant: 'danger',
+     *   confirmLabel: 'Delete',
+     * })
+     * if (confirmed) {
+     *   await clearHistory()
+     * }
+     * ```
+     */
+    confirm(options: {
+      /** Header title. */
+      title: string;
+      /** Body text explaining what the user is confirming. */
+      message: string;
+      /**
+       * Visual variant for the confirm button.
+       * `'info'` (default) | `'warning'` | `'danger'` | `'success'`
+       */
+      variant?: "info" | "warning" | "danger" | "success";
+      /** Label for the confirm button. Default: `"Confirm"`. */
+      confirmLabel?: string;
+      /** Label for the cancel button. Default: `"Cancel"`. */
+      cancelLabel?: string;
+      /** For operator-scoped extensions only. */
+      userId?: string;
+    }): Promise<{
+      /** `true` if the user clicked confirm, `false` if cancelled or dismissed. */
+      confirmed: boolean;
+    }>;
   };
 
   /** This extension's manifest */

@@ -261,6 +261,43 @@ export interface SpindleModalHandle {
   onDismiss(handler: () => void): () => void;
 }
 
+// ── Confirmation Modal ──
+
+/** Visual variant for confirmation modals. Controls the accent color of the confirm button. */
+export type SpindleConfirmVariant = "info" | "warning" | "danger" | "success";
+
+/**
+ * Options for `ctx.ui.showConfirm()`.
+ * The host renders a system-themed confirmation modal with a message,
+ * variant-colored accent, and actionable buttons.
+ */
+export interface SpindleConfirmOptions {
+  /** Modal title displayed in the header. */
+  title: string;
+  /** Body text explaining what the user is confirming. */
+  message: string;
+  /**
+   * Visual variant that controls the confirm button's accent color.
+   * - `'info'` — neutral/blue (default)
+   * - `'warning'` — yellow/amber
+   * - `'danger'` — red — use for destructive or irreversible actions
+   * - `'success'` — green
+   */
+  variant?: SpindleConfirmVariant;
+  /** Label for the confirm (primary) button. Default: `"Confirm"`. */
+  confirmLabel?: string;
+  /** Label for the cancel (secondary) button. Default: `"Cancel"`. */
+  cancelLabel?: string;
+}
+
+/**
+ * Result returned by `ctx.ui.showConfirm()`.
+ */
+export interface SpindleConfirmResult {
+  /** `true` if the user clicked the confirm button, `false` if they cancelled or dismissed. */
+  confirmed: boolean;
+}
+
 /** Context object provided to frontend extension modules */
 export interface SpindleFrontendContext {
   dom: SpindleDOMHelper;
@@ -295,6 +332,30 @@ export interface SpindleFrontendContext {
      * ```
      */
     showModal(options: SpindleModalOptions): SpindleModalHandle;
+    /**
+     * Show a system-themed confirmation modal and wait for the user's response.
+     * Returns `{ confirmed: true }` if the user clicks the confirm button,
+     * or `{ confirmed: false }` if they cancel or dismiss the modal.
+     *
+     * The confirm button is styled according to the `variant` option
+     * (info, warning, danger, success) to signal intent to the user.
+     *
+     * Counts toward the **2 stacked modals** limit per extension.
+     *
+     * @example
+     * ```ts
+     * const { confirmed } = await ctx.ui.showConfirm({
+     *   title: 'Delete History',
+     *   message: 'This will permanently erase all nudge history for this character.',
+     *   variant: 'danger',
+     *   confirmLabel: 'Delete',
+     * })
+     * if (confirmed) {
+     *   ctx.sendToBackend({ type: 'delete_history', characterId })
+     * }
+     * ```
+     */
+    showConfirm(options: SpindleConfirmOptions): Promise<SpindleConfirmResult>;
   };
   uploads: {
     pickFile(options?: {
