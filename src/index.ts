@@ -52,6 +52,9 @@ export type {
   ImageGenResultDTO,
   ThemeOverrideDTO,
   ThemeInfoDTO,
+  ColorExtractionResult,
+  ColorRGB,
+  ColorHSL,
   WorkerToHost,
   HostToWorker,
 } from "./api";

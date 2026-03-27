@@ -500,8 +500,8 @@ export interface PermissionDeniedDetail {
  */
 export interface ThemeOverrideDTO {
   /**
-   * Direct CSS variable overrides. Keys are CSS custom property names
-   * (e.g. `--lumiverse-primary`, `--lumiverse-bg`, `--lcs-glass-bg`).
+   * Direct CSS variable overrides applied regardless of light/dark mode.
+   * Keys are CSS custom property names (e.g. `--lumiverse-primary`).
    * Values must be valid CSS values.
    *
    * Common variable groups:
@@ -522,6 +522,66 @@ export interface ThemeOverrideDTO {
    * - **Transitions**: `--lumiverse-transition`, `--lumiverse-transition-fast`, `--lcs-transition`, `--lcs-transition-fast`
    */
   variables?: Record<string, string>;
+
+  /**
+   * Mode-specific CSS variable overrides. When the user switches between
+   * light and dark mode, the frontend selects the matching set.
+   * Mode-specific values override flat `variables` for the same key.
+   */
+  variablesByMode?: {
+    dark?: Record<string, string>;
+    light?: Record<string, string>;
+  };
+}
+
+/**
+ * RGB color value (0–255 per channel).
+ */
+export interface ColorRGB {
+  r: number;
+  g: number;
+  b: number;
+}
+
+/**
+ * HSL color value (h: 0–360, s: 0–100, l: 0–100).
+ */
+export interface ColorHSL {
+  h: number;
+  s: number;
+  l: number;
+}
+
+/**
+ * Result of extracting colors from an image.
+ * Each region's dominant color is returned along with metadata.
+ */
+export interface ColorExtractionResult {
+  /** Overall dominant color of the full image */
+  dominant: ColorRGB;
+  /** Dominant color per sampled region */
+  regions: {
+    top: ColorRGB;
+    center: ColorRGB;
+    bottom: ColorRGB;
+    left: ColorRGB;
+    right: ColorRGB;
+  };
+  /** Per-region flatness score (0–1). High values = monotone/solid region. */
+  flatness: {
+    top: number;
+    center: number;
+    bottom: number;
+    left: number;
+    right: number;
+    full: number;
+  };
+  /** Simple average color across all sampled pixels */
+  average: ColorRGB;
+  /** Whether the dominant color is perceived as light (luminance > 152) */
+  isLight: boolean;
+  /** HSL representation of the dominant color */
+  dominantHsl: ColorHSL;
 }
 
 /**
@@ -784,7 +844,9 @@ export type WorkerToHost =
   // ─── Theme (gated: "app_manipulation") ──────────────────────────────────
   | { type: "theme_apply"; requestId: string; overrides: ThemeOverrideDTO; userId?: string }
   | { type: "theme_clear"; requestId: string; userId?: string }
-  | { type: "theme_get_current"; requestId: string; userId?: string };
+  | { type: "theme_get_current"; requestId: string; userId?: string }
+  // ─── Color Extraction (gated: "app_manipulation") ─────────────────────
+  | { type: "color_extract"; requestId: string; imageId: string; userId?: string };
 
 // ─── Host → Worker messages ──────────────────────────────────────────────
 

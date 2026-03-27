@@ -31,6 +31,7 @@ import type {
   ImageGenProviderDTO,
   ThemeOverrideDTO,
   ThemeInfoDTO,
+  ColorExtractionResult,
 } from "./api";
 
 /** The global `spindle` object available in backend extension workers */
@@ -557,15 +558,26 @@ export interface SpindleAPI {
    *
    * @example
    * ```ts
-   * // Apply a blue-tinted theme
+   * // Apply a blue-tinted theme with mode-aware backgrounds
    * await spindle.theme.apply({
    *   variables: {
    *     '--lumiverse-primary': 'hsl(210, 80%, 60%)',
-   *     '--lumiverse-bg': 'hsl(210, 12%, 11%)',
-   *     '--lumiverse-bg-elevated': 'hsl(210, 12%, 14%)',
-   *     '--lcs-glass-bg': 'hsla(210, 12%, 6%, 0.55)',
+   *   },
+   *   variablesByMode: {
+   *     dark: {
+   *       '--lumiverse-bg': 'hsl(210, 12%, 11%)',
+   *       '--lumiverse-bg-elevated': 'hsl(210, 12%, 14%)',
+   *     },
+   *     light: {
+   *       '--lumiverse-bg': 'hsl(210, 20%, 96%)',
+   *       '--lumiverse-bg-elevated': 'hsl(210, 20%, 100%)',
+   *     },
    *   },
    * })
+   *
+   * // Extract colors from an image, then apply as theme
+   * const palette = await spindle.theme.extractColors('image-id-here')
+   * console.log(palette.dominant, palette.regions, palette.dominantHsl)
    *
    * // Read current theme state
    * const info = await spindle.theme.getCurrent()
@@ -581,6 +593,9 @@ export interface SpindleAPI {
      * Subsequent calls merge with (and overwrite) any previously applied
      * overrides from this extension. The frontend applies overrides
      * immediately via a WebSocket event.
+     *
+     * Use `variablesByMode` to specify different values for light/dark mode.
+     * Mode-specific values take precedence over flat `variables` for the same key.
      */
     apply(overrides: ThemeOverrideDTO): Promise<void>;
     /**
@@ -593,6 +608,15 @@ export interface SpindleAPI {
      * Returns the base theme info (not including any extension overrides).
      */
     getCurrent(userId?: string): Promise<ThemeInfoDTO>;
+    /**
+     * Extract colors from an image stored in Lumiverse's image system.
+     * Returns dominant, regional, and average colors with flatness scores.
+     * Useful for building mode-aware theme overrides from character avatars
+     * or other images.
+     *
+     * @param imageId - ID of an image in the images table
+     */
+    extractColors(imageId: string, userId?: string): Promise<ColorExtractionResult>;
   };
 
   /** This extension's manifest */
