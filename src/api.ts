@@ -496,6 +496,8 @@ export interface PermissionDeniedDetail {
  * when a permission is granted or revoked at runtime (without restart).
  */
 export interface PermissionChangedDetail {
+  /** Identifier of the extension whose permission changed */
+  extensionId: string;
   /** The permission that changed */
   permission: string;
   /** Whether the permission was granted (true) or revoked (false) */
