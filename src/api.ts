@@ -617,6 +617,8 @@ export interface ThemeInfoDTO {
   radiusScale: number;
   /** Font size multiplier (1.0 = default) */
   fontScale: number;
+  /** Full UI zoom multiplier (1.0 = default, affects all elements via CSS zoom) */
+  uiScale: number;
   /** Whether the theme dynamically adapts to the active character's avatar */
   characterAware: boolean;
 }

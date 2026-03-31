@@ -59,6 +59,10 @@ export interface CouncilToolsSettings {
   allowUserControl: boolean;
   /** Word limit per tool response (0 = unlimited). */
   maxWordsPerTool: number;
+  /** When true, council tools are NOT re-executed on regenerations and swipes.
+   *  Instead, the last successful council results (cached in chat metadata) are
+   *  reused. Tools still fire for fresh sends, continues, impersonations, etc. */
+  retainResultsForRegens?: boolean;
   /**
    * @deprecated Sidecar config is now stored as a top-level `sidecarSettings`
    * user setting. This field is read as a fallback for backwards compatibility.
@@ -92,6 +96,18 @@ export interface CouncilExecutionResult {
   results: CouncilToolResult[];
   deliberationBlock: string;
   totalDurationMs: number;
+}
+
+/** Cached council results persisted in `chat.metadata.last_council_results`.
+ *  Used when `retainResultsForRegens` is enabled to skip re-execution on
+ *  regenerations and swipes. */
+export interface CachedCouncilResult {
+  results: CouncilToolResult[];
+  deliberationBlock: string;
+  /** Named result variables extracted from tool definitions with `resultVariable`. */
+  namedResults: Record<string, string>;
+  /** Unix epoch ms when this cache was written. */
+  cachedAt: number;
 }
 
 // ---- Tool Definition ----
@@ -146,6 +162,7 @@ export const COUNCIL_TOOLS_DEFAULTS: CouncilToolsSettings = {
   includeWorldInfo: true,
   allowUserControl: false,
   maxWordsPerTool: 250,
+  retainResultsForRegens: false,
 };
 
 export const COUNCIL_SETTINGS_DEFAULTS: CouncilSettings = {

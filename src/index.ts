@@ -108,6 +108,7 @@ export type {
   CouncilSettings,
   CouncilToolResult,
   CouncilExecutionResult,
+  CachedCouncilResult,
   CouncilToolCategory,
   CouncilToolDefinition,
 } from "./council";
