@@ -753,6 +753,54 @@ export interface SpindleAPI {
   };
 
   /**
+   * User input prompts (free tier — no permission needed).
+   * Present a text input modal to the user and await their response.
+   * The call blocks until the user submits or cancels.
+   *
+   * @example
+   * ```ts
+   * const { value, cancelled } = await spindle.prompt.input({
+   *   title: 'Rename Preset',
+   *   placeholder: 'Enter a name...',
+   *   defaultValue: currentName,
+   * })
+   * if (!cancelled && value) {
+   *   await renamePreset(value)
+   * }
+   * ```
+   */
+  prompt: {
+    /**
+     * Show a text input modal and wait for the user's response.
+     *
+     * @returns `value` is the submitted text (trimmed), or `null` if cancelled.
+     */
+    input(options: {
+      /** Modal header title. */
+      title: string;
+      /** Optional description shown below the title. */
+      message?: string;
+      /** Input placeholder text. */
+      placeholder?: string;
+      /** Pre-filled value. */
+      defaultValue?: string;
+      /** Submit button label. Default: `"Submit"`. */
+      submitLabel?: string;
+      /** Cancel button label. Default: `"Cancel"`. */
+      cancelLabel?: string;
+      /** Use a multi-line textarea instead of a single-line input. */
+      multiline?: boolean;
+      /** For operator-scoped extensions only. */
+      userId?: string;
+    }): Promise<{
+      /** The submitted text, or `null` if the user cancelled. */
+      value: string | null;
+      /** `true` if the user cancelled or dismissed the prompt. */
+      cancelled: boolean;
+    }>;
+  };
+
+  /**
    * Command palette integration (free tier — no permission needed).
    * Register commands that appear in the Lumiverse command palette
    * (Cmd/Ctrl+K). Commands are contextual — call `register()` with
