@@ -32,6 +32,7 @@ import type {
   ImageGenProviderDTO,
   ThemeOverrideDTO,
   ThemeInfoDTO,
+  ThemePaletteConfigDTO,
   ThemeVariablesConfigDTO,
   ColorExtractionResult,
   SpindleModalItemDTO,
@@ -617,6 +618,15 @@ export interface SpindleAPI {
      * Mode-specific values take precedence over flat `variables` for the same key.
      */
     apply(overrides: ThemeOverrideDTO): Promise<void>;
+    /**
+     * Apply a palette-driven theme using Lumiverse's own presentation rules.
+     *
+     * Unlike `apply()`, this method does not let extensions push raw CSS
+     * variables. Lumiverse derives the full light/dark variable maps from the
+     * provided accent and preserves the user's glass, radius, font, and UI
+     * scale settings.
+     */
+    applyPalette(palette: ThemePaletteConfigDTO, userId?: string): Promise<void>;
     /**
      * Remove all CSS variable overrides previously applied by this extension.
      * The UI reverts to the user's base theme.

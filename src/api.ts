@@ -665,6 +665,19 @@ export interface ThemeVariablesConfigDTO {
   };
 }
 
+/**
+ * Input config for `spindle.theme.applyPalette()`.
+ *
+ * This is the safe, presentation-owned path for live extension theming.
+ * Extensions provide palette intent only; Lumiverse preserves the user's
+ * radius, glass, font, and UI-scale settings and generates the final
+ * mode-aware variable maps itself.
+ */
+export interface ThemePaletteConfigDTO {
+  /** Primary accent color in HSL. */
+  accent: { h: number; s: number; l: number };
+}
+
 // ─── Modal content items (used by backend-initiated modals) ─────────────
 
 /**
@@ -972,6 +985,7 @@ export type WorkerToHost =
   | { type: "image_gen_models"; requestId: string; connectionId: string; userId?: string }
   // ─── Theme (gated: "app_manipulation") ──────────────────────────────────
   | { type: "theme_apply"; requestId: string; overrides: ThemeOverrideDTO; userId?: string }
+  | { type: "theme_apply_palette"; requestId: string; palette: ThemePaletteConfigDTO; userId?: string }
   | { type: "theme_clear"; requestId: string; userId?: string }
   | { type: "theme_get_current"; requestId: string; userId?: string }
   // ─── Color Extraction (gated: "app_manipulation") ─────────────────────
