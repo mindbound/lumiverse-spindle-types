@@ -724,6 +724,13 @@ export interface SpindleAPI {
        * Default: `false`.
        */
       persistent?: boolean;
+      /**
+       * Caller-provided request ID for the modal. When supplied, the host uses
+       * this value (instead of the internal correlation requestId) as the modal
+       * identity key, enabling programmatic close via `spindle.modal.close()`
+       * before the modal resolves.
+       */
+      modalRequestId?: string;
       /** For operator-scoped extensions only. */
       userId?: string;
     }): Promise<{

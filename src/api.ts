@@ -983,7 +983,7 @@ export type WorkerToHost =
   // ─── Text Editor (free tier) ───────────────────────────────────────
   | { type: "text_editor_open"; requestId: string; title?: string; value?: string; placeholder?: string; userId?: string }
   // ─── Modal (free tier) ────────────────────────────────────────────
-  | { type: "modal_open"; requestId: string; title: string; items: SpindleModalItemDTO[]; width?: number; maxHeight?: number; persistent?: boolean; userId?: string }
+  | { type: "modal_open"; requestId: string; modalRequestId?: string; title: string; items: SpindleModalItemDTO[]; width?: number; maxHeight?: number; persistent?: boolean; userId?: string }
   | { type: "modal_close"; requestId: string; openRequestId: string; userId?: string }
   | { type: "confirm_open"; requestId: string; title: string; message: string; variant?: "info" | "warning" | "danger" | "success"; confirmLabel?: string; cancelLabel?: string; userId?: string }
   | { type: "input_prompt_open"; requestId: string; title: string; message?: string; placeholder?: string; defaultValue?: string; submitLabel?: string; cancelLabel?: string; multiline?: boolean; userId?: string }
